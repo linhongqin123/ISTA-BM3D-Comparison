@@ -1,1 +1,643 @@
+\documentclass[10pt,twocolumn]{article}
 
+\usepackage[english]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\usepackage{cite}
+\usepackage{url}
+\usepackage{hyperref}
+\usepackage{siunitx}
+\usepackage{xcolor}
+\usepackage{multirow}
+\usepackage{listings}
+\usepackage{titlesec}
+\usepackage{float}
+\usepackage{lipsum}
+\usepackage{makecell} 
+\usepackage{enumitem} % 新增：更好的列表控制
+\usepackage{microtype}
+\usepackage{calc} % 间距计算
+\usepackage{enumerate} % 列表自定义间距/缩进（必备）
+
+% Page layout
+\usepackage[top=1.5cm, bottom=1.5cm, left=1.0cm, right=1.0cm]{geometry}
+% 减小页边距
+
+% 设置更紧凑的标题格式
+\titleformat{\section}{\normalfont\large\bfseries}{\thesection}{0.5em}{}
+\titleformat{\subsection}{\normalfont\bfseries}{\thesubsection}{0.5em}{}
+\titleformat{\subsubsection}{\normalfont\itshape}{\thesubsubsection}{0.5em}{}
+
+% 设置紧凑的列表间距
+\setlist[itemize]{topsep=2pt, parsep=0pt, partopsep=0pt, itemsep=1pt, leftmargin=*}
+\setlist[enumerate]{topsep=2pt, parsep=0pt, partopsep=0pt, itemsep=1pt, leftmargin=*}
+
+% Define colors
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+% Code listing style
+\lstset{
+    backgroundcolor=\color{backcolour},
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,
+    breaklines=true,
+    captionpos=b,
+    keepspaces=true,
+    numbers=left,
+    numbersep=5pt,
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    tabsize=2,
+    language=Python
+}
+
+% 表格设置：更小的字体和紧凑间距
+\captionsetup[table]{font=small, labelfont=bf, skip=4pt}
+\captionsetup[figure]{font=small, labelfont=bf, skip=4pt}
+
+% Title formatting
+\title{\textbf{Comparative Study of ISTA and BM3D Algorithms for Image Denoising}}
+\author{
+    \textit{Name : linhongqin} \\
+    \small University Name : SouthWest Petroleum University\\
+}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+This paper presents a comprehensive comparative analysis of two prominent image denoising algorithms: Iterative Shrinkage-Thresholding Algorithm (ISTA) and Block-Matching and 3D Filtering (BM3D). Through extensive experiments conducted on the Set14 benchmark dataset and custom images, we quantitatively evaluate their performance under various noise types (Gaussian and salt-and-pepper) and noise levels. Experimental results demonstrate that BM3D achieves significantly superior denoising quality (average PSNR improvement of 7.64 dB), while ISTA exhibits overwhelming computational efficiency (approximately 260 times faster). This study provides practical guidelines for algorithm selection based on application requirements: ISTA is recommended for real-time applications with limited computational resources, whereas BM3D is preferred for scenarios demanding high-quality denoising with relaxed time constraints.
+\end{abstract}
+
+\section{Introduction}
+\label{sec:introduction}
+
+\subsection{Research Background}
+Image denoising represents a fundamental challenge in digital image processing, with applications spanning medical imaging, remote sensing, and multimedia systems. The development of sparse representation theory and non-local similarity principles has led to significant advancements in denoising methodologies. Among these, the Iterative Shrinkage-Thresholding Algorithm (ISTA) has emerged as a classical optimization-based approach, while Block-Matching and 3D Filtering (BM3D) stands as one of the most effective traditional denoising algorithms.
+
+\subsection{Research Objectives}
+This study aims to:
+\begin{itemize}
+    \item Systematically compare the denoising performance of ISTA and BM3D algorithms
+    \item Analyze convergence characteristics and parameter sensitivity
+    \item Investigate computational efficiency trade-offs
+    \item Provide practical recommendations for algorithm selection based on application scenarios
+\end{itemize}
+
+\section{Theoretical Background}
+\label{sec:theory}
+
+\subsection{Iterative Shrinkage-Thresholding Algorithm (ISTA)}
+ISTA solves the LASSO (Least Absolute Shrinkage and Selection Operator) problem formulated as:
+
+\begin{equation}
+\min_{x} \frac{1}{2} \|x - y\|_2^2 + \lambda \|x\|_1
+\label{eq:lasso}
+\end{equation}
+
+The iterative update rule is given by:
+
+\begin{equation}
+x_{k+1} = S_{\lambda t}(x_k - t \nabla f(x_k))
+\label{eq:ista_update}
+\end{equation}
+
+where $S_{\lambda t}(\cdot)$ represents the soft-thresholding operator:
+
+\begin{equation}
+S_{\lambda t}(z) = \text{sign}(z) \cdot \max(|z| - \lambda t, 0)
+\label{eq:soft_threshold}
+\end{equation}
+
+\textbf{Algorithm Characteristics:}
+\begin{itemize}
+    \item Iterative solution of LASSO problems
+    \item Incorporates sparsity through soft-thresholding
+    \item Convergence rate of $O(1/k)$
+    \item Simple implementation with minimal memory requirements
+\end{itemize}
+
+\subsection{Block-Matching and 3D Filtering (BM3D)}
+The BM3D algorithm comprises four principal stages:
+
+\begin{enumerate}
+    \item \textbf{Block grouping}: Identification of similar image patches
+    \item \textbf{3D transformation}: Collaborative filtering in transform domain
+    \item \textbf{Thresholding}: Hard-thresholding or Wiener filtering
+    \item \textbf{Inverse transformation and aggregation}: Reconstruction and patch aggregation
+\end{enumerate}
+
+\textbf{Core Principles:}
+\begin{itemize}
+    \item Exploitation of non-local self-similarity in images
+    \item Collaborative filtering in 3D transform domain
+    \item Two-stage processing: basic estimate followed by Wiener filtering
+    \item Excellent edge and texture preservation capabilities
+\end{itemize}
+
+\section{Experimental Design}
+\subsection{Datasets}
+\begin{itemize}
+    \item \textbf{Set14 Dataset}: Three standard test images (baboon, barbara, bridge)
+    \item \textbf{Custom Image}: ppt3.png (656 × 529 pixels) containing complex textures
+\end{itemize}
+
+\subsection{Noise Configurations}
+\begin{table}[htbp]
+\centering
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\caption{Noise configurations used in experiments}
+\label{tab:noise_config}
+\resizebox{1.0\linewidth}{!}{
+\begin{tabular}{@{}lcl@{}}
+\toprule
+\textbf{Noise Type} & \textbf{Parameters} & \textbf{Notation} \\
+\midrule
+Gaussian Noise & $\sigma = 10, 25, 50$ & $\mathcal{N}(0, \sigma^2)$ \\
+Salt-and-Pepper Noise & $p = 4\%, 10\%, 20\%$ & $\mathcal{P}(p_{\text{salt}}, p_{\text{pepper}})$ \\
+\bottomrule
+\end{tabular}
+}
+\end{table}
+
+
+\subsection{Evaluation Metrics}
+\begin{itemize}
+    \item \textbf{Peak Signal-to-Noise Ratio (PSNR)}:
+    \begin{equation}
+    \text{PSNR} = 10 \cdot \log_{10}\left(\frac{\text{MAX}^2}{\text{MSE}}\right)
+    \label{eq:psnr}
+    \end{equation}
+    
+    \item \textbf{Structural Similarity Index (SSIM)}:
+    \begin{equation}
+    \text{SSIM}(x, y) = \frac{(2\mu_x\mu_y + C_1)(2\sigma_{xy} + C_2)}{(\mu_x^2 + \mu_y^2 + C_1)(\sigma_x^2 + \sigma_y^2 + C_2)}
+    \label{eq:ssim}
+    \end{equation}
+    
+    \item \textbf{Computational Time}: Execution time in seconds
+    \item \textbf{Convergence Residual}: Residual error for iterative algorithms
+\end{itemize}
+
+\subsection{Parameter Settings}
+
+Table \ref{tab:params} summarizes the parameter configurations used for both algorithms in our experiments.
+
+\begin{table}[htbp]
+\centering
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\caption{Algorithm parameter configurations}
+\label{tab:params}
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Parameter} & \textbf{ISTA} & \textbf{BM3D} \\
+\midrule
+Regularization & $\lambda = 0.1$ & Default configuration \\
+Step size & $t = 1.0$ & -- \\
+Max iterations & $50$ & -- \\
+Convergence tolerance & $1 \times 10^{-6}$ & -- \\
+Noise parameter & -- & $\sigma_{\text{psd}} = 25$ (for salt-and-pepper) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Experimental Results and Analysis}
+\label{sec:results}
+
+\subsection{Denoising Performance Comparison}
+Using the parameters defined above, we evaluated both algorithms on the Set14 dataset. Table \ref{tab:avg_performance} presents the average performance metrics across all test images.
+
+\begin{table}[htbp]
+\centering
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\caption{Average performance on Set14 dataset}
+\label{tab:avg_performance}
+\begin{tabular}{@{}lccc@{}}
+\toprule
+\textbf{Algorithm} & \textbf{Avg PSNR (dB)} & \textbf{Avg SSIM} & \textbf{Avg Time (s)} \\
+\midrule
+ISTA & $15.87 \pm 2.27$ & $0.4377 \pm 0.1921$ & $0.01 \pm 0.00$ \\
+BM3D & $23.51 \pm 6.22$ & $0.6227 \pm 0.2364$ & $2.64 \pm 0.54$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\vspace{-0.2em}
+\textbf{Key Findings:}
+\begin{itemize}
+    \item BM3D outperforms ISTA by \textbf{7.64 dB} in average PSNR
+    \item BM3D achieves \textbf{0.1849} higher average SSIM than ISTA
+    \item ISTA demonstrates \textbf{260×} faster computation than BM3D
+\end{itemize}
+\vspace{-0.2em}
+
+To further analyze performance differences, we examined results by noise type in Table \ref{tab:noise_performance}.
+
+\begin{table}[htbp]
+\centering
+\caption{Performance comparison by noise type}
+\label{tab:noise_performance}
+\resizebox{0.85\linewidth}{!}{ % 宽度为页面85%，高度自动适配
+\begin{tabular}{@{}lccc@{}}
+\toprule
+\textbf{Noise Type} & \textbf{ISTA PSNR (dB)} & \textbf{BM3D PSNR (dB)} & \textbf{Improvement (dB)} \\
+\midrule
+Gaussian Noise & $16.86$ & $27.91$ & $+11.05$ \\
+Salt-and-Pepper Noise & $14.89$ & $19.12$ & $+4.23$ \\
+\bottomrule
+\end{tabular}}
+\end{table}
+
+
+\subsection{Visualization of Denoising Results}
+Figure \ref{fig:visual_comparison} provides a visual comparison of denoising results on ppt3.png with Gaussian noise ($\sigma=25$).
+
+\begin{figure}[htbp]
+\centering
+% 第一行：4个图像对比
+\begin{subfigure}{0.2\textwidth}
+\centering
+\includegraphics[width=\linewidth]{results/ppt3_fixed/ppt3_original.png}
+\caption{Original}
+\label{fig:original}
+\end{subfigure}
+\hfill
+\begin{subfigure}{0.2\textwidth}
+\centering
+\includegraphics[width=\linewidth]{results/ppt3_fixed/ppt3_noisy_Gaussian_sigma_25.png}
+\caption{Noisy}
+\label{fig:noisy}
+\end{subfigure}
+\hfill
+\begin{subfigure}{0.2\textwidth}
+\centering
+\includegraphics[width=\linewidth]{results/ppt3_fixed/ppt3_ista_Gaussian_sigma_25.png}
+\caption{ISTA}
+\label{fig:ista_denoised}
+\end{subfigure}
+\hfill
+\begin{subfigure}{0.2\textwidth}
+\centering
+\includegraphics[width=\linewidth]{results/ppt3_fixed/ppt3_bm3d_Gaussian_sigma_25.png}
+\caption{BM3D}
+\label{fig:bm3d_denoised}
+\end{subfigure}
+
+\vspace{0.2cm}
+
+% 第二行：2个性能对比图
+\begin{subfigure}{0.4\textwidth}
+\centering
+\includegraphics[width=\linewidth]{results/ppt3_fixed/psnr_comparison.png}
+\caption{PSNR}
+\label{fig:psnr_comparison}
+\end{subfigure}
+\hfill
+\begin{subfigure}{0.4\textwidth}
+\centering
+\includegraphics[width=\linewidth]{results/ppt3_fixed/time_comparison.png}
+\caption{Time}
+\label{fig:time_comparison}
+\end{subfigure}
+
+\caption{Visual comparison of denoising results on ppt3.png with Gaussian noise ($\sigma=25$). (a) Original image, (b) Noisy image, (c) ISTA result, (d) BM3D result, (e) PSNR comparison across noise types, (f) Computation time comparison.}
+\label{fig:visual_comparison}
+\end{figure}
+
+For a more detailed analysis, Table \ref{tab:visual_results} presents quantitative results across different noise types and levels on the ppt3.png image.
+
+\begin{table}[htbp]
+\centering
+\scriptsize
+\setlength{\tabcolsep}{2pt}
+\caption{Quantitative denoising results on ppt3.png}
+\label{tab:visual_results}
+\begin{tabular}{@{}lcccccc@{}}
+\toprule
+\textbf{Noise Type} & \textbf{\makecell{Noisy\\PSNR}} & \textbf{\makecell{ISTA\\PSNR}} & \textbf{\makecell{BM3D\\PSNR}} & \textbf{\makecell{ISTA\\SSIM}} & \textbf{\makecell{BM3D\\SSIM}} & \textbf{Improvement} \\
+\midrule
+$\sigma=10$ & 29.41 & 19.10 & 35.42 & 0.6884 & 0.9665 & +16.32 \\
+$\sigma=25$ & 21.70 & 17.02 & 28.72 & 0.4070 & 0.9302 & +11.70 \\
+$\sigma=50$ & 16.00 & 13.82 & 22.97 & 0.2441 & 0.8756 & +9.15 \\
+SP 4\% & 17.84 & 16.05 & 20.45 & 0.5023 & 0.5951 & +4.40 \\
+SP 10\% & 13.85 & 13.19 & 16.00 & 0.2730 & 0.3375 & +2.81 \\
+SP 20\% & 10.87 & 10.65 & 11.59 & 0.1723 & 0.1773 & +0.93 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Based on the visual and quantitative results, we make the following observations:
+
+\textbf{Visual Observations:}
+\begin{itemize}
+    \item \textbf{Gaussian Noise}: BM3D effectively removes noise while preserving texture details, with PSNR improvements of 9-16 dB
+    \item \textbf{Salt-and-Pepper Noise}: BM3D performs well at low densities, but effectiveness diminishes at higher densities (20\%), with only 0.93 dB improvement
+    \item \textbf{ISTA Results}: Exhibits global smoothing with insufficient detail preservation, particularly for high noise levels
+\end{itemize}
+
+Given that ISTA demonstrated significantly faster computation (260× faster than BM3D) despite lower reconstruction quality, we further investigate its convergence behavior and parameter sensitivity.
+
+\subsection{Convergence Analysis of ISTA}
+To optimize ISTA's performance, we conducted a detailed analysis of its convergence behavior with respect to key parameters. Figure \ref{fig:convergence_analysis} illustrates the effects of step size and regularization parameter $\lambda$ on ISTA's convergence.
+
+\begin{figure}[htbp]
+\centering
+\captionsetup[subfigure]{font=tiny, skip=2pt} % 子图标题紧凑化，适配双栏
+% 双栏最优宽度0.48\linewidth，\hfill均匀分布，无多余留白
+\begin{subfigure}{0.48\linewidth}
+\centering
+\includegraphics[width=\linewidth]{results/convergence_analysis/convergence_step_sizes.png}
+\caption{Step size effect}
+\label{fig:step_size}
+\end{subfigure}
+\hfill
+\begin{subfigure}{0.48\linewidth}
+\centering
+\includegraphics[width=\linewidth]{results/convergence_analysis/convergence_lambdas.png}
+\caption{$\lambda$ effect}
+\label{fig:lambda_effect}
+\end{subfigure}
+% 简化主标题，子图标注已清晰，避免冗余
+\caption{ISTA convergence behavior analysis.}
+\label{fig:convergence_analysis}
+\vspace{3pt} % 图片与下文微小间距，避免紧贴
+\end{figure}
+
+Table \ref{tab:step_size} quantifies the effect of step size on ISTA's convergence speed.
+
+\begin{table}[htbp]
+\centering
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{1.05} % 微调行高，避免文字拥挤
+\caption{Effect of step size on ISTA convergence ($\lambda=0.1$, max iterations=100)}
+\label{tab:step_size}
+% siunitx按数值格式对齐，提升表格专业性，文字列单独定义
+\begin{tabular}{@{}S[table-format=1.1]S[table-format=3.0]lS[table-format=1.0]@{}}
+\toprule
+{\textbf{Step Size}} & {\textbf{Iterations}} & \textbf{Final Residual} & {\textbf{Convergence}} \\
+\midrule
+0.1 & 95  & $1\times10^{-6}$ & {Slow}      \\
+0.5 & 18  & $1\times10^{-6}$ & {Fast}      \\
+1.0 & 2   & $1\times10^{-6}$ & {Optimal}   \\
+1.5 & 20  & $1\times10^{-6}$ & {Fast}      \\
+2.0 & 100 & 0.4386           & {Diverged}  \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Observation:} Step size $t = 1.0$ provides optimal convergence, converging in only 2 iterations. Larger values ($t = 2.0$) cause divergence, while smaller values result in slower convergence.
+
+To analyze the trade-off between noise removal and detail preservation, Table \ref{tab:lambda_effect} shows the effect of the regularization parameter $\lambda$ on ISTA's performance.
+
+\begin{table}[htbp]
+\centering
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\caption{Effect of $\lambda$ on ISTA performance (step size=1.0)}
+\label{tab:lambda_effect}
+% 针对性数值对齐，λ和PSNR按小数点对齐，提升整洁度
+\begin{tabular}{@{}S[table-format=1.2]S[table-format=2.2]S[table-format=2.0]l@{}}
+\toprule
+{$\lambda$} & {\textbf{Final PSNR (dB)}} & {\textbf{Iterations}} & \textbf{Evaluation} \\
+\midrule
+0.01 & 20.60 & 2 & Optimal (risk of overfitting) \\
+0.05 & 19.66 & 2 & Good performance              \\
+0.10 & 17.58 & 2 & Moderate                      \\
+0.20 & 13.84 & 2 & Over-smoothing                \\
+0.50 & 7.71  & 2 & Severe over-smoothing         \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Conclusion:} $\lambda = 0.01$ achieves optimal PSNR (20.60 dB) but requires careful monitoring for overfitting. The parameter demonstrates a clear trade-off between noise removal and detail preservation.
+
+\subsection{Computational Efficiency Analysis}
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.7\linewidth]{results/experiment_fixed/time_comparison.png}
+\caption{Computation time comparison between ISTA and BM3D}
+\label{fig:time_comparison_full}
+\end{figure}
+
+\begin{table}[htbp]
+\centering
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\caption{Time efficiency comparison between ISTA and BM3D}
+\label{tab:time_efficiency}
+\begin{tabular}{@{}lccc@{}}
+\toprule
+\textbf{Algorithm} & \textbf{Avg Time (s)} & \textbf{Min Time (s)} & \textbf{Max Time (s)} \\
+\midrule
+ISTA & 0.013 & 0.001 & 0.022 \\
+BM3D & 2.840 & 2.040 & 3.473 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Key Observation:} ISTA's exceptional speed (average 0.013 seconds) makes it suitable for real-time applications, while BM3D's computational overhead (average 2.840 seconds) stems from block-matching and 3D transformations.
+
+\section{Algorithm Analysis and Discussion}
+\label{sec:discussion}
+
+\subsection{Algorithm Comparison}
+\begin{itemize}
+    \item \textbf{ISTA}: Operates via pixel-level optimization with sparse constraints, emphasizing local gradient information and $\ell_1$ regularization.
+    \item \textbf{BM3D}: Leverages non-local self-similarity through patch grouping and collaborative filtering in the transform domain.
+\end{itemize}
+
+\textbf{Quality vs. Speed Trade-off:}
+\begin{itemize}
+    \item \textbf{BM3D's Superior Quality}: Achieved through exploitation of image self-similarity and collaborative filtering
+    \item \textbf{ISTA's Computational Efficiency}: Resulting from simple iterative updates with linear complexity $O(n)$
+\end{itemize}
+
+\subsection{Computational Time Analysis}
+The dramatic difference in computation time (260× faster for ISTA) stems from fundamental algorithmic differences:
+\begin{enumerate}
+    \item \textbf{ISTA Complexity}: $O(n)$ per iteration, with typically 2-20 iterations for convergence
+    \item \textbf{BM3D Complexity}: $O(n^2)$ due to block-matching process
+    \item \textbf{Memory Requirements}: ISTA requires minimal memory, while BM3D needs storage for patch groups
+\end{enumerate}
+
+\subsection{Convergence Behavior Analysis}
+\begin{figure}[htbp]
+\centering
+\begin{subfigure}{0.48\textwidth}
+\centering
+\includegraphics[width=\linewidth]{results/convergence_analysis/iteration_vs_quality.png}
+\caption{Iterations vs quality}
+\end{subfigure}
+\hfill
+\begin{subfigure}{0.48\textwidth}
+\centering
+\includegraphics[width=\linewidth]{results/convergence_analysis/stepsize_vs_performance.png}
+\caption{Step size vs performance}
+\end{subfigure}
+\caption{ISTA convergence behavior analysis.}
+\label{fig:convergence_detailed}
+\end{figure}
+
+\textbf{Convergence Characteristics:}
+\begin{enumerate}
+    \item \textbf{Rapid Convergence}: ISTA typically converges within 2-20 iterations
+    \item \textbf{Step Size Sensitivity}: Optimal step size is critical
+    \item \textbf{Noise Condition Impact}: Convergence behavior remains consistent across different noise types
+\end{enumerate}
+
+\textbf{Optimal Parameters Identified:}
+\begin{itemize}
+    \item Step size: $t = 1.0$ (optimal convergence speed)
+    \item Regularization: $\lambda = 0.01$ (best quality, PSNR 20.60 dB)
+    \item Iterations: 15 (ensures convergence without unnecessary computation)
+\end{itemize}
+
+\subsection{Advantages and Limitations}
+\begin{table}[htbp]
+\centering
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\caption{Comparative analysis of algorithm characteristics}
+\label{tab:comparison}
+\begin{tabular}{@{}p{0.5\linewidth}p{0.5\linewidth}@{}}
+\toprule
+\textbf{ISTA} & \textbf{BM3D} \\
+\midrule
+\textbf{Advantages:} & \textbf{Advantages:} \\
+• Low computational complexity & • Superior denoising quality \\
+• Minimal parameter tuning & • Excellent edge preservation \\
+• Fast convergence & • Optimal for Gaussian noise \\
+• Small memory footprint & • Well-established framework \\
+\\
+\textbf{Limitations:} & \textbf{Limitations:} \\
+• Moderate denoising quality & • High computational complexity \\
+• Poor on structured noise & • Large memory requirements \\
+• Risk of over-smoothing & • Moderate on salt-and-pepper \\
+• Parameter sensitivity & • Complex parameter optimization \\
+\bottomrule
+\end{tabular}
+
+\end{table}
+
+\subsection{Application Scenarios}
+
+\subsubsection{ISTA Recommended Applications}
+\begin{itemize}
+    \item \textbf{Real-time video processing}: Low-latency requirements
+    \item \textbf{Mobile devices}: Limited computational resources
+    \item \textbf{Preprocessing stages}: Initial denoising for complex pipelines
+    \item \textbf{Large-scale image processing}: Time-sensitive operations
+\end{itemize}
+
+\subsubsection{BM3D Recommended Applications}
+\begin{itemize}
+    \item \textbf{Medical imaging}: Critical quality requirements
+    \item \textbf{Satellite imagery}: Preservation of fine details
+    \item \textbf{Offline image enhancement}: Quality over speed
+    \item \textbf{Benchmark reference}: Performance comparison standard
+\end{itemize}
+
+\subsection{Hybrid Strategy Recommendations}
+\begin{enumerate}
+    \item \textbf{Two-stage processing}: ISTA for rapid preprocessing followed by BM3D for refinement
+    \item \textbf{Adaptive selection}: Automatic algorithm selection based on noise characteristics
+    \item \textbf{Parameter adaptation}: Dynamic parameter adjustment according to noise levels
+\end{enumerate}
+
+\section{Conclusions and Future Work}
+\label{sec:conclusion}
+
+\subsection{Principal Conclusions}
+\begin{enumerate}
+    \item \textbf{Quality Performance}: BM3D demonstrates superior denoising quality, outperforming ISTA by an average of 7.64 dB PSNR
+    \item \textbf{Computational Efficiency}: ISTA exhibits remarkable speed advantages, being approximately 260 times faster than BM3D
+    \item \textbf{Application Suitability}: 
+    \begin{itemize}
+        \item ISTA: Ideal for real-time applications with computational constraints
+        \item BM3D: Preferred for high-quality requirements in non-real-time scenarios
+    \end{itemize}
+    \item \textbf{Optimal Parameters}: ISTA achieves best performance with step size $t=1.0$ and $\lambda=0.01$, converging in only 2 iterations
+\end{enumerate}
+
+\subsection{Innovative Contributions}
+\begin{itemize}
+    \item Comprehensive performance comparison across multiple noise types and levels
+    \item In-depth analysis of ISTA convergence properties and parameter sensitivity
+    \item Practical algorithm selection framework based on application requirements
+\end{itemize}
+
+\subsection{Future Research Directions}
+\begin{enumerate}
+    \item \textbf{Algorithm Enhancement}: 
+    \begin{itemize}
+        \item Investigation of accelerated ISTA variants (FISTA, ADMM)
+        \item Development of approximate fast implementations for BM3D
+    \end{itemize}
+    \item \textbf{Application Expansion}:
+    \begin{itemize}
+        \item Extension to color images and video sequences
+        \item Integration with deep learning approaches
+    \end{itemize}
+    \item \textbf{Theoretical Analysis}:
+    \begin{itemize}
+        \item Derivation of theoretical bounds under specific noise models
+        \item Development of adaptive parameter selection strategies
+    \end{itemize}
+\end{enumerate}
+
+\section*{Acknowledgments}
+The authors acknowledge the support provided by the computational resources at their institution. We also thank the developers of open-source libraries including Python-BM3D, OpenCV, and SciPy for their valuable contributions.
+
+\bibliographystyle{IEEEtran}
+\begin{thebibliography}{9}
+
+\bibitem{beck2009}
+A. Beck and M. Teboulle, 
+\textit{A fast iterative shrinkage-thresholding algorithm for linear inverse problems},
+SIAM Journal on Imaging Sciences, vol. 2, no. 1, pp. 183-202, 2009.
+
+\bibitem{dabov2007}
+K. Dabov, A. Foi, V. Katkovnik, and K. Egiazarian,
+\textit{Image denoising by sparse 3-D transform-domain collaborative filtering},
+IEEE Transactions on Image Processing, vol. 16, no. 8, pp. 2080-2095, 2007.
+
+\bibitem{donoho1995}
+D. L. Donoho,
+\textit{De-noising by soft-thresholding},
+IEEE Transactions on Information Theory, vol. 41, no. 3, pp. 613-627, 1995.
+
+\bibitem{set14}
+\textit{Set14 dataset for image super-resolution},
+Available: \url{https://github.com/jbhuang0604/SelfExSR}
+
+\bibitem{bm3d_python}
+\textit{Python implementation of BM3D},
+Available: \url{https://github.com/ericmjonas/pybm3d}
+
+\end{thebibliography}
+
+\section*{Appendix: Project Repository}
+The complete source code, experimental results, and this report are publicly available at:\\
+\url{https://github.com/linhongqin123/ISTA-BM3D-Comparison}.
+
+\end{document}
