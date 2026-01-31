@@ -1,0 +1,37 @@
+algorithm,image_idx,noise_type,noise_info,noise_params,psnr,ssim,time,iterations,lambda,sigma_psd
+ISTA,0,gaussian,gaussian_sigma_10,"{'type': 'gaussian', 'sigma': 10}",19.25316547158619,0.7901591661296987,0.00452876091003418,2.0,0.1,
+ISTA,0,gaussian,gaussian_sigma_25,"{'type': 'gaussian', 'sigma': 25}",17.308294184891945,0.5439643945000854,0.00550389289855957,2.0,0.1,
+ISTA,0,gaussian,gaussian_sigma_50,"{'type': 'gaussian', 'sigma': 50}",14.098499350602818,0.3145607208849902,0.0059986114501953125,2.0,0.1,
+ISTA,0,salt_pepper,salt_pepper_0.04,"{'type': 'salt_pepper', 'salt_prob': 0.02, 'pepper_prob': 0.02}",17.24994869615126,0.5950626556176452,0.003003835678100586,2.0,0.1,
+ISTA,0,salt_pepper,salt_pepper_0.10,"{'type': 'salt_pepper', 'salt_prob': 0.05, 'pepper_prob': 0.05}",14.962710875763614,0.38856686581606675,0.004000186920166016,2.0,0.1,
+ISTA,0,salt_pepper,salt_pepper_0.20,"{'type': 'salt_pepper', 'salt_prob': 0.1, 'pepper_prob': 0.1}",12.809791891138953,0.24662746198235813,0.004930734634399414,2.0,0.1,
+ISTA,1,gaussian,gaussian_sigma_10,"{'type': 'gaussian', 'sigma': 10}",19.22396902495856,0.674046917736746,0.01654505729675293,2.0,0.1,
+ISTA,1,gaussian,gaussian_sigma_25,"{'type': 'gaussian', 'sigma': 25}",17.299597291273454,0.4149567852885631,0.016144752502441406,2.0,0.1,
+ISTA,1,gaussian,gaussian_sigma_50,"{'type': 'gaussian', 'sigma': 50}",14.085122919764695,0.22569273314661956,0.015071868896484375,2.0,0.1,
+ISTA,1,salt_pepper,salt_pepper_0.04,"{'type': 'salt_pepper', 'salt_prob': 0.02, 'pepper_prob': 0.02}",17.142488668959984,0.49817647750246297,0.013530731201171875,2.0,0.1,
+ISTA,1,salt_pepper,salt_pepper_0.10,"{'type': 'salt_pepper', 'salt_prob': 0.05, 'pepper_prob': 0.05}",14.87261088187594,0.29523568658650023,0.014528751373291016,2.0,0.1,
+ISTA,1,salt_pepper,salt_pepper_0.20,"{'type': 'salt_pepper', 'salt_prob': 0.1, 'pepper_prob': 0.1}",12.697567585634522,0.18149927442830413,0.016190528869628906,2.0,0.1,
+ISTA,2,gaussian,gaussian_sigma_10,"{'type': 'gaussian', 'sigma': 10}",19.194357227705552,0.7834393922894141,0.009759664535522461,2.0,0.1,
+ISTA,2,gaussian,gaussian_sigma_25,"{'type': 'gaussian', 'sigma': 25}",17.231783933196162,0.514413276073703,0.010649919509887695,2.0,0.1,
+ISTA,2,gaussian,gaussian_sigma_50,"{'type': 'gaussian', 'sigma': 50}",14.050422293621558,0.27714525435890425,0.010429143905639648,2.0,0.1,
+ISTA,2,salt_pepper,salt_pepper_0.04,"{'type': 'salt_pepper', 'salt_prob': 0.02, 'pepper_prob': 0.02}",17.05846615738863,0.5752922576368985,0.008627653121948242,2.0,0.1,
+ISTA,2,salt_pepper,salt_pepper_0.10,"{'type': 'salt_pepper', 'salt_prob': 0.05, 'pepper_prob': 0.05}",14.768440564199985,0.3555602526296815,0.011126041412353516,2.0,0.1,
+ISTA,2,salt_pepper,salt_pepper_0.20,"{'type': 'salt_pepper', 'salt_prob': 0.1, 'pepper_prob': 0.1}",12.598337322060548,0.21878334830064233,0.009998321533203125,2.0,0.1,
+BM3D,0,gaussian,gaussian_sigma_10,"{'type': 'gaussian', 'sigma': 10}",11.897348196633082,0.17652665118966165,2.069347858428955,,,10.0
+BM3D,0,gaussian,gaussian_sigma_25,"{'type': 'gaussian', 'sigma': 25}",8.283138175908991,0.049450395448080116,2.15574049949646,,,25.0
+BM3D,0,gaussian,gaussian_sigma_50,"{'type': 'gaussian', 'sigma': 50}",7.432304599939847,0.011694587520762741,2.0934345722198486,,,50.0
+BM3D,0,salt_pepper,salt_pepper_0.04,"{'type': 'salt_pepper', 'salt_prob': 0.02, 'pepper_prob': 0.02}",8.29230193551296,0.049949514567036765,2.2112185955047607,,,25.0
+BM3D,0,salt_pepper,salt_pepper_0.10,"{'type': 'salt_pepper', 'salt_prob': 0.05, 'pepper_prob': 0.05}",8.271920127941915,0.04928266344960214,2.2060980796813965,,,25.0
+BM3D,0,salt_pepper,salt_pepper_0.20,"{'type': 'salt_pepper', 'salt_prob': 0.1, 'pepper_prob': 0.1}",8.23722794982127,0.0475381897402834,1.9970319271087646,,,25.0
+BM3D,1,gaussian,gaussian_sigma_10,"{'type': 'gaussian', 'sigma': 10}",12.432954805069414,0.3297063607361503,3.3172640800476074,,,10.0
+BM3D,1,gaussian,gaussian_sigma_25,"{'type': 'gaussian', 'sigma': 25}",8.05411552787499,0.09666686495352816,3.2290267944335938,,,25.0
+BM3D,1,gaussian,gaussian_sigma_50,"{'type': 'gaussian', 'sigma': 50}",6.931472919983351,0.023446394531699055,3.354973077774048,,,50.0
+BM3D,1,salt_pepper,salt_pepper_0.04,"{'type': 'salt_pepper', 'salt_prob': 0.02, 'pepper_prob': 0.02}",8.044618470077799,0.09783327273986558,3.3544204235076904,,,25.0
+BM3D,1,salt_pepper,salt_pepper_0.10,"{'type': 'salt_pepper', 'salt_prob': 0.05, 'pepper_prob': 0.05}",7.993207782354012,0.09725445311943115,3.243170976638794,,,25.0
+BM3D,1,salt_pepper,salt_pepper_0.20,"{'type': 'salt_pepper', 'salt_prob': 0.1, 'pepper_prob': 0.1}",7.889005307675499,0.09511298064505039,3.258862257003784,,,25.0
+BM3D,2,gaussian,gaussian_sigma_10,"{'type': 'gaussian', 'sigma': 10}",11.91646276725229,0.2207759406227922,2.237610340118408,,,10.0
+BM3D,2,gaussian,gaussian_sigma_25,"{'type': 'gaussian', 'sigma': 25}",7.681061905729428,0.0648276567377138,2.190828800201416,,,25.0
+BM3D,2,gaussian,gaussian_sigma_50,"{'type': 'gaussian', 'sigma': 50}",6.518071209125286,0.01531989904307907,2.2287447452545166,,,50.0
+BM3D,2,salt_pepper,salt_pepper_0.04,"{'type': 'salt_pepper', 'salt_prob': 0.02, 'pepper_prob': 0.02}",7.673119178013939,0.06498575377099898,2.219285011291504,,,25.0
+BM3D,2,salt_pepper,salt_pepper_0.10,"{'type': 'salt_pepper', 'salt_prob': 0.05, 'pepper_prob': 0.05}",7.622323265247899,0.06359195625781029,2.27693510055542,,,25.0
+BM3D,2,salt_pepper,salt_pepper_0.20,"{'type': 'salt_pepper', 'salt_prob': 0.1, 'pepper_prob': 0.1}",7.527583439059576,0.06124350529133447,2.462411403656006,,,25.0
